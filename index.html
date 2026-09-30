@@ -18,24 +18,26 @@
   * { box-sizing: border-box; }
   html, body { margin: 0; }
   body {
-    background: #e9e4d8;
+    background: #fff;
     color: var(--ink);
     font-family: "Nunito", system-ui, sans-serif;
   }
   main {
-    max-width: 1055px;
-    margin: 0 auto;
-    padding: 16px;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   /* Mapa s okénky */
   .mapa {
     position: relative;
-    width: 100%;
+    /* obrázek vyplní celou obrazovku (vejde se celý, bez posouvání) */
+    width: min(100vw, 100vh * 1055 / 1491);
+    width: min(100vw, 100dvh * 1055 / 1491);
     aspect-ratio: 1055 / 1491;
-    background: var(--paper);
-    box-shadow: 0 6px 30px rgba(0,0,0,.18);
-    border-radius: 6px;
+    background: #fff;
     overflow: hidden;
   }
   .mapa img {
@@ -86,12 +88,6 @@
     to   { transform: scale(1) rotate(0); }
   }
 
-  .pata {
-    text-align: center;
-    font-size: 14px;
-    color: #5a5446;
-    margin: 14px 0 4px;
-  }
 
   /* Modální okno */
   dialog {
@@ -175,7 +171,6 @@
   <div class="mapa" id="mapa">
     <img src="img/mapa.jpg" alt="Mapa obce Mouchnice s 24 adventními domečky" width="1055" height="1491">
   </div>
-  <p class="pata">Klikni na domeček s dnešním datem a otevři adventní okénko.</p>
 </main>
 
 <dialog id="modal" aria-labelledby="modal-nadpis">
