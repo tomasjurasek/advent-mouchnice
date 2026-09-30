@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adventní okénka v Mouchnicích</title>
+<meta name="description" content="Adventní kalendář obce Mouchnice – každý den jedno okénko.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1c1c1c;
+    --paper: #fbf8f1;
+    --red: #b3261e;
+    --green: #2e6b3a;
+    --gold: #d9a520;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: #e9e4d8;
+    color: var(--ink);
+    font-family: "Nunito", system-ui, sans-serif;
+  }
+  main {
+    max-width: 1055px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  /* Mapa s okénky */
+  .mapa {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1055 / 1491;
+    background: var(--paper);
+    box-shadow: 0 6px 30px rgba(0,0,0,.18);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .mapa img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  .okenko {
+    position: absolute;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 6px;
+    /* tvar domečku – ať hover kopíruje obrázek */
+    clip-path: polygon(50% 0, 100% 42%, 100% 100%, 0 100%, 0 42%);
+    transition: background-color .2s, transform .2s;
+  }
+  .okenko:hover, .okenko:focus-visible {
+    background: rgba(217, 165, 32, .28);
+    transform: scale(1.04);
+    outline: none;
+  }
+  .okenko.zamceno { cursor: not-allowed; }
+  .okenko.zamceno:hover { background: rgba(0,0,0,.06); transform: none; }
+  .okenko.dnes {
+    background: rgba(179, 38, 30, .16);
+    animation: pulz 1.8s ease-in-out infinite;
+  }
+  @keyframes pulz {
+    0%, 100% { background: rgba(179, 38, 30, .10); }
+    50%      { background: rgba(179, 38, 30, .30); }
+  }
+  /* „Nálepka" na otevřeném okénku */
+  .okenko .nalepka {
+    position: absolute;
+    right: 6%; bottom: 6%;
+    font-size: clamp(14px, 3.4vw, 34px);
+    line-height: 1;
+    pointer-events: none;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,.3));
+    animation: nalep .4s ease-out;
+  }
+  @keyframes nalep {
+    from { transform: scale(0) rotate(-40deg); }
+    to   { transform: scale(1) rotate(0); }
+  }
+
+  .pata {
+    text-align: center;
+    font-size: 14px;
+    color: #5a5446;
+    margin: 14px 0 4px;
+  }
+
+  /* Modální okno */
+  dialog {
+    border: 0;
+    padding: 0;
+    width: min(520px, calc(100vw - 32px));
+    max-height: calc(100vh - 32px);
+    border-radius: 16px;
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    overflow: auto;
+  }
+  dialog::backdrop {
+    background: rgba(20, 25, 35, .55);
+    backdrop-filter: blur(2px);
+  }
+  dialog[open] { animation: otevri .35s cubic-bezier(.2,.9,.3,1.3); }
+  @keyframes otevri {
+    from { transform: scale(.7) translateY(20px); opacity: 0; }
+    to   { transform: none; opacity: 1; }
+  }
+  .modal-hlava {
+    position: relative;
+    background: var(--red);
+    color: #fff;
+    padding: 22px 56px 18px 24px;
+    background-image:
+      radial-gradient(circle at 12% 30%, rgba(255,255,255,.25) 2px, transparent 3px),
+      radial-gradient(circle at 70% 20%, rgba(255,255,255,.25) 2px, transparent 3px),
+      radial-gradient(circle at 40% 80%, rgba(255,255,255,.2) 1.5px, transparent 2.5px),
+      radial-gradient(circle at 88% 70%, rgba(255,255,255,.2) 1.5px, transparent 2.5px);
+  }
+  .modal-den {
+    font-size: 14px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    opacity: .9;
+  }
+  .modal-hlava h2 {
+    margin: 2px 0 0;
+    font-family: "Dancing Script", cursive;
+    font-size: 36px;
+    line-height: 1.1;
+  }
+  .zavrit {
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 36px; height: 36px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,.2);
+    color: #fff;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .zavrit:hover { background: rgba(255,255,255,.35); }
+  .modal-telo {
+    padding: 20px 24px 24px;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  .modal-telo img {
+    display: block;
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 14px;
+  }
+  .modal-telo p { margin: 0 0 .8em; }
+  .modal-telo p:last-child { margin-bottom: 0; }
+  .zamek { text-align: center; font-size: 48px; margin-bottom: 6px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <div class="mapa" id="mapa">
+    <img src="img/mapa.jpg" alt="Mapa obce Mouchnice s 24 adventními domečky" width="1055" height="1491">
+  </div>
+  <p class="pata">Klikni na domeček s dnešním datem a otevři adventní okénko.</p>
+</main>
+
+<dialog id="modal" aria-labelledby="modal-nadpis">
+  <div class="modal-hlava">
+    <div class="modal-den" id="modal-den"></div>
+    <h2 id="modal-nadpis"></h2>
+    <button class="zavrit" type="button" aria-label="Zavřít">×</button>
+  </div>
+  <div class="modal-telo" id="modal-telo"></div>
+</dialog>
+
+<script src="okenka.js"></script>
+<script>
+  // Rok, ve kterém advent probíhá (okénko N se odemkne N. prosince).
+  const ROK_ADVENTU = 2026;
+
+  // Pozice domečků v obrázku mapy (px v originálu 1055×1491): [x1, y1, x2, y2]
+  const OBR_W = 1055, OBR_H = 1491;
+  const DOMECKY = {
+    1:  [ 75, 316, 193, 447],
+    2:  [305, 404, 421, 533],
+    3:  [628, 352, 748, 483],
+    4:  [500, 455, 619, 582],
+    5:  [872, 388, 993, 517],
+    6:  [113, 503, 236, 635],
+    7:  [302, 562, 423, 688],
+    8:  [480, 598, 601, 723],
+    9:  [815, 560, 936, 691],
+    10: [933, 592, 1035, 717],
+    11: [363, 742, 486, 866],
+    12: [660, 729, 783, 859],
+    13: [812, 736, 941, 867],
+    14: [200, 940, 321, 1066],
+    15: [529, 940, 651, 1066],
+    16: [886, 955, 1006, 1083],
+    17: [ 84, 1075, 211, 1203],
+    18: [368, 1095, 494, 1222],
+    19: [527, 1097, 651, 1223],
+    20: [766, 1107, 887, 1223],
+    21: [173, 1217, 301, 1345],
+    22: [350, 1235, 473, 1357],
+    23: [586, 1233, 711, 1358],
+    24: [850, 1235, 978, 1364],
+  };
+
+  const NALEPKY = ["⭐", "🎄", "🔔", "🎁", "❄️", "🕯️", "🍪", "⛄", "🦌", "🎅", "🌟", "🧦"];
+
+  // ?test v adrese odemkne všechna okénka (pro kontrolu obsahu před adventem)
+  const params = new URLSearchParams(location.search);
+  const TEST = params.has("test");
+
+  const dnes = new Date();
+  const dnesDen =
+    dnes.getFullYear() === ROK_ADVENTU && dnes.getMonth() === 11 ? dnes.getDate() : null;
+
+  function jeOdemceno(den) {
+    if (TEST) return true;
+    const otevreni = new Date(ROK_ADVENTU, 11, den);
+    return dnes >= otevreni;
+  }
+
+  const KLIC = "mouchnice-advent-" + ROK_ADVENTU;
+  function nactiOtevrena() {
+    try { return new Set(JSON.parse(localStorage.getItem(KLIC) || "[]")); }
+    catch { return new Set(); }
+  }
+  function ulozOtevrena(set) {
+    try { localStorage.setItem(KLIC, JSON.stringify([...set])); } catch {}
+  }
+  const otevrena = nactiOtevrena();
+
+  const mapa = document.getElementById("mapa");
+  const modal = document.getElementById("modal");
+  const modalDen = document.getElementById("modal-den");
+  const modalNadpis = document.getElementById("modal-nadpis");
+  const modalTelo = document.getElementById("modal-telo");
+  const tlacitka = {};
+
+  function pridejNalepku(den) {
+    const btn = tlacitka[den];
+    if (!btn || btn.querySelector(".nalepka")) return;
+    const s = document.createElement("span");
+    s.className = "nalepka";
+    s.textContent = NALEPKY[(den - 1) % NALEPKY.length];
+    btn.appendChild(s);
+  }
+
+  for (const [den, [x1, y1, x2, y2]] of Object.entries(DOMECKY)) {
+    const d = Number(den);
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "okenko";
+    btn.style.left = (x1 / OBR_W * 100) + "%";
+    btn.style.top = (y1 / OBR_H * 100) + "%";
+    btn.style.width = ((x2 - x1) / OBR_W * 100) + "%";
+    btn.style.height = ((y2 - y1) / OBR_H * 100) + "%";
+    btn.setAttribute("aria-label", "Okénko " + d);
+    if (!jeOdemceno(d)) btn.classList.add("zamceno");
+    if (d === dnesDen && !otevrena.has(d)) btn.classList.add("dnes");
+    btn.addEventListener("click", () => otevri(d));
+    mapa.appendChild(btn);
+    tlacitka[d] = btn;
+    if (otevrena.has(d)) pridejNalepku(d);
+  }
+
+  function otevri(den) {
+    modalDen.textContent = den + ". prosince";
+    modalTelo.replaceChildren();
+
+    if (!jeOdemceno(den)) {
+      modalNadpis.textContent = "Ještě ne!";
+      const zbyva = Math.ceil((new Date(ROK_ADVENTU, 11, den) - dnes) / 86400000);
+      modalTelo.innerHTML =
+        '<div class="zamek">🔒</div><p style="text-align:center">Toto okénko se otevře ' +
+        den + ". prosince " + ROK_ADVENTU + ".<br>Zbývá " + zbyva + " " +
+        (zbyva === 1 ? "den" : zbyva < 5 ? "dny" : "dní") + ". Vydrž!</p>";
+    } else {
+      const o = (typeof OKENKA !== "undefined" && OKENKA[den]) || {};
+      modalNadpis.textContent = o.nadpis || "Okénko č. " + den;
+      if (o.obrazek) {
+        const img = document.createElement("img");
+        img.src = o.obrazek;
+        img.alt = o.nadpis || "";
+        modalTelo.appendChild(img);
+      }
+      const div = document.createElement("div");
+      div.innerHTML = (o.text || "").split(/\n\s*\n/).map(p => "<p>" + p + "</p>").join("");
+      modalTelo.appendChild(div);
+
+      otevrena.add(den);
+      ulozOtevrena(otevrena);
+      tlacitka[den].classList.remove("dnes");
+      pridejNalepku(den);
+    }
+    modal.showModal();
+  }
+
+  modal.querySelector(".zavrit").addEventListener("click", () => modal.close());
+  // zavření kliknutím mimo okno
+  modal.addEventListener("click", e => { if (e.target === modal) modal.close(); });
+
+  // přímý odkaz na okénko: index.html#12
+  const hash = parseInt(location.hash.slice(1), 10);
+  if (DOMECKY[hash]) otevri(hash);
+</script>
+</body>
+</html>
