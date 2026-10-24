@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Adventní okénka v Mouchnicích</title>
+<title>Mouchnická adventní okénka</title>
 <meta name="description" content="Adventní kalendář obce Mouchnice – každý den jedno okénko.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
@@ -22,6 +22,46 @@
     color: var(--ink);
     font-family: "Nunito", system-ui, sans-serif;
   }
+  /* Úvodní text nad mapou */
+  .uvod {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 16px 24px;
+    font-size: 17px;
+    line-height: 1.6;
+  }
+  .uvod h1 {
+    margin: 0;
+    font-family: "Dancing Script", cursive;
+    font-size: clamp(40px, 9vw, 64px);
+    line-height: 1.1;
+    color: var(--red);
+    text-align: center;
+  }
+  .uvod .podtitul {
+    margin: 6px 0 24px;
+    text-align: center;
+    font-weight: 700;
+    color: var(--green);
+    font-size: 19px;
+  }
+  .uvod h2 {
+    margin: 28px 0 10px;
+    font-family: "Dancing Script", cursive;
+    font-size: 34px;
+    color: var(--red);
+  }
+  .uvod ul { padding-left: 1.2em; }
+  .uvod li { margin-bottom: .7em; }
+  .uvod li::marker { content: "★  "; color: var(--gold); }
+  .uvod strong { color: var(--green); }
+  .uvod .tesime {
+    font-family: "Dancing Script", cursive;
+    font-size: 28px;
+    text-align: center;
+    color: var(--red);
+  }
+
   main {
     min-height: 100vh;
     min-height: 100dvh;
@@ -39,6 +79,7 @@
     aspect-ratio: 1055 / 1491;
     background: #fff;
     overflow: hidden;
+    container-type: inline-size; /* cqw = % šířky mapy, ať domečky škálují s obrázkem */
   }
   .mapa img {
     position: absolute; inset: 0;
@@ -47,31 +88,67 @@
     user-select: none;
     -webkit-user-drag: none;
   }
+  /* Bílá plocha přes text v pravém horním rohu obrázku */
+  .zakryt {
+    position: absolute;
+    left: 76.3%; top: 2.3%; width: 23.2%; height: 13.8%;
+    background: #fff;
+    clip-path: polygon(0 0, 100% 0, 100% 78%, 75% 78%, 75% 100%, 0 100%);
+  }
+  /* Bílá plocha přes druhou (duplicitní) osmičku v obrázku */
+  .zakryt.dum8 {
+    left: 58.6%; top: 37.1%; width: 12.2%; height: 9.7%;
+    clip-path: polygon(50% 0, 73% 19%, 72% 3%, 93% 3%, 93% 36%, 100% 42%, 100% 100%, 0 100%, 0 42%);
+  }
+
+  /* HTML domeček položený přes ten nakreslený v obrázku */
   .okenko {
     position: absolute;
     border: 0;
     padding: 0;
-    background: transparent;
+    background: none;
     cursor: pointer;
-    border-radius: 6px;
-    /* tvar domečku – ať hover kopíruje obrázek */
-    clip-path: polygon(50% 0, 100% 42%, 100% 100%, 0 100%, 0 42%);
-    transition: background-color .2s, transform .2s;
+    transition: transform .2s;
   }
-  .okenko:hover, .okenko:focus-visible {
-    background: rgba(217, 165, 32, .28);
-    transform: scale(1.04);
-    outline: none;
+  .okenko svg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    overflow: visible;
   }
+  .okenko .dum, .okenko .komin {
+    fill: #fff;
+    stroke: var(--ink);
+    stroke-width: .3cqw;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+    transition: fill .2s;
+  }
+  .okenko .ram {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: .12cqw;
+    stroke-dasharray: .45cqw .35cqw;
+    vector-effect: non-scaling-stroke;
+  }
+  .okenko .cislo {
+    position: absolute;
+    left: 0; right: 0; top: 42%; bottom: 6%;
+    display: grid;
+    place-items: center;
+    font-size: 3.2cqw;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .okenko:hover, .okenko:focus-visible { transform: scale(1.04); outline: none; }
+  .okenko:hover .dum, .okenko:focus-visible .dum { fill: #f8e7b5; }
+  .okenko.otevreno .dum { fill: #fbe39a; } /* otevřené okénko „svítí" */
   .okenko.zamceno { cursor: not-allowed; }
-  .okenko.zamceno:hover { background: rgba(0,0,0,.06); transform: none; }
-  .okenko.dnes {
-    background: rgba(179, 38, 30, .16);
-    animation: pulz 1.8s ease-in-out infinite;
-  }
+  .okenko.zamceno:hover { transform: none; }
+  .okenko.zamceno:hover .dum { fill: #f0f0f0; }
+  .okenko.dnes .dum { animation: pulz 1.8s ease-in-out infinite; }
   @keyframes pulz {
-    0%, 100% { background: rgba(179, 38, 30, .10); }
-    50%      { background: rgba(179, 38, 30, .30); }
+    0%, 100% { fill: #fff; }
+    50%      { fill: #f3c2bd; }
   }
   /* „Nálepka" na otevřeném okénku */
   .okenko .nalepka {
@@ -167,9 +244,26 @@
 </style>
 </head>
 <body>
+<header class="uvod">
+  <h1>Mouchnická adventní okénka</h1>
+  <p class="podtitul">24 dní, 24 okének a spousta prosincové radosti!</p>
+  <p>Pojďte si společně užít kouzelný a netradiční advent v Mouchnicích. Od 1. do 24. prosince se naše vesnice promění v malé předvánoční dobrodružství, ve kterém budeme hledat rozsvícená adventní okénka ukrytá na různých místech ve vesnici.</p>
+
+  <h2>Jak to bude probíhat?</h2>
+  <ul>
+    <li><strong>Každý den nové okénko.</strong> Od 1. do 24. prosince se v Mouchnicích rozsvítí jedno adventní okénko – na rodinném domě, jiné budově nebo na zajímavém místě v obci. Okénka budou svítit každý den od 17:00 do 19:00 hodin, pouze na Štědrý den, 24. prosince, už od 10:00 do 12:00 hodin.</li>
+    <li><strong>Vyluštěte, kam se vydat.</strong> Níže na této stránce najdete očíslované domečky. Po rozkliknutí každého z nich se vám zobrazí jednoduchá hádanka nebo šifra, která vás navede na místo, kde okénko v ten den najdete. Vytištěné hádanky vždy na následující den najdete také fyzicky u jednotlivých adventních okének.</li>
+    <li><strong>Objevte okénko a získejte razítko.</strong> Na každém místě – u rozsvíceného okénka na vás bude čekat razítko, kterým si můžete označit domeček na sběratelské kartičce. Kartičku jste dostali buďto do schránky, nebo ji můžete vyzvednout na OÚ Mouchnice, nebo budou k dispozici u prvního okénka.</li>
+    <li><strong>Sbírejte razítka a užívejte si advent.</strong> Postupně můžete nasbírat všech 24 razítek a zpříjemnit si čekání na Vánoce procházkami po Mouchnicích, luštěním hádanek a třeba i milými sousedskými setkáními.</li>
+  </ul>
+  <p>Mouchnická adventní okénka nejsou o soutěžení ani o dokonalé výzdobě. Jejich kouzlo spočívá především v radosti ze společného objevování, v příležitosti vyrazit ven i v zimním čase, potkat sousedy a užít si advent trochu jinak. Tak vezměte děti, rodiče, babičky i dědečky a vyrazte společně objevovat naši vesnici.</p>
+  <p class="tesime">Těšíme se na společné dobrodružství!</p>
+</header>
 <main>
   <div class="mapa" id="mapa">
     <img src="img/mapa.jpg" alt="Mapa obce Mouchnice s 24 adventními domečky" width="1055" height="1491">
+    <div class="zakryt" aria-hidden="true"></div>
+    <div class="zakryt dum8" aria-hidden="true"></div>
   </div>
 </main>
 
@@ -190,33 +284,41 @@
   // Pozice domečků v obrázku mapy (px v originálu 1055×1491): [x1, y1, x2, y2]
   const OBR_W = 1055, OBR_H = 1491;
   const DOMECKY = {
-    1:  [ 75, 316, 193, 447],
-    2:  [305, 404, 421, 533],
-    3:  [628, 352, 748, 483],
-    4:  [500, 455, 619, 582],
-    5:  [872, 388, 993, 517],
-    6:  [113, 503, 236, 635],
-    7:  [302, 562, 423, 688],
-    8:  [480, 598, 601, 723],
-    9:  [815, 560, 936, 691],
-    10: [933, 592, 1035, 717],
-    11: [363, 742, 486, 866],
-    12: [660, 729, 783, 859],
-    13: [812, 736, 941, 867],
-    14: [200, 940, 321, 1066],
-    15: [529, 940, 651, 1066],
-    16: [886, 955, 1006, 1083],
-    17: [ 84, 1075, 211, 1203],
-    18: [368, 1095, 494, 1222],
-    19: [527, 1097, 651, 1223],
-    20: [766, 1107, 887, 1223],
-    21: [173, 1217, 301, 1345],
-    22: [350, 1235, 473, 1357],
-    23: [586, 1233, 711, 1358],
-    24: [850, 1235, 978, 1364],
+    1:  [ 75, 315, 195, 448],
+    2:  [303, 404, 425, 535],
+    3:  [627, 352, 748, 483],
+    4:  [498, 455, 618, 582],
+    5:  [872, 387, 994, 518],
+    6:  [113, 502, 235, 636],
+    7:  [302, 561, 423, 688],
+    8:  [477, 595, 604, 724],
+    9:  [815, 559, 935, 692],
+    10: [932, 591, 1035, 718],
+    11: [363, 742, 485, 866],
+    12: [659, 728, 783, 859],
+    13: [812, 735, 940, 868],
+    14: [887, 955, 1003, 1083],
+    15: [528, 939, 649, 1065],
+    16: [199, 939, 320, 1066],
+    17: [ 82, 1074, 210, 1204],
+    18: [370, 1093, 493, 1222],
+    19: [526, 1096, 649, 1222],
+    20: [762, 1107, 882, 1223],
+    21: [173, 1216, 301, 1344],
+    22: [348, 1232, 472, 1356],
+    23: [585, 1232, 711, 1357],
+    24: [848, 1234, 977, 1365],
   };
 
-  const NALEPKY = ["⭐", "🎄", "🔔", "🎁", "❄️", "🕯️", "🍪", "⛄", "🦌", "🎅", "🌟", "🧦"];
+  // Tvar domečku v souřadnicích 0–100 (roztáhne se na rámeček z DOMECKY)
+  const DUM_SVG =
+    '<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">' +
+    '<polygon class="komin" points="73,20 73,5 85,5 85,30"/>' +
+    '<polygon class="dum" points="50,0 100,42 96,42 96,100 4,100 4,42 0,42"/>' +
+    '<polygon class="ram" points="50,9 88,41 88,93 12,93 12,41"/>' +
+    "</svg>";
+
+  const NALEPKY = ["⭐", "🎄", "🔔", "🎁", "❄️", "🕯️", "🍪", "🦌", "🎅", "🌟", "🧦"];
 
   // ?test v adrese odemkne všechna okénka (pro kontrolu obsahu před adventem)
   const params = new URLSearchParams(location.search);
@@ -252,6 +354,7 @@
   function pridejNalepku(den) {
     const btn = tlacitka[den];
     if (!btn || btn.querySelector(".nalepka")) return;
+    btn.classList.add("otevreno");
     const s = document.createElement("span");
     s.className = "nalepka";
     s.textContent = NALEPKY[(den - 1) % NALEPKY.length];
@@ -268,6 +371,7 @@
     btn.style.width = ((x2 - x1) / OBR_W * 100) + "%";
     btn.style.height = ((y2 - y1) / OBR_H * 100) + "%";
     btn.setAttribute("aria-label", "Okénko " + d);
+    btn.innerHTML = DUM_SVG + '<span class="cislo">' + d + "</span>";
     if (!jeOdemceno(d)) btn.classList.add("zamceno");
     if (d === dnesDen && !otevrena.has(d)) btn.classList.add("dnes");
     btn.addEventListener("click", () => otevri(d));
