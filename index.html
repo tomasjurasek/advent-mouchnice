@@ -101,6 +101,19 @@
     clip-path: polygon(50% 0, 73% 19%, 72% 3%, 93% 3%, 93% 36%, 100% 42%, 100% 100%, 0 100%, 0 42%);
   }
 
+  .mapa .stromy {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .stromy .b { fill: #fff; }
+  .stromy .tenke { stroke-width: 1.5; }
+
   /* HTML domeček položený přes ten nakreslený v obrázku */
   .okenko {
     position: absolute;
@@ -264,6 +277,24 @@
     <img src="img/mapa.jpg" alt="Mapa obce Mouchnice s 24 adventními domečky" width="1055" height="1491">
     <div class="zakryt" aria-hidden="true"></div>
     <div class="zakryt dum8" aria-hidden="true"></div>
+    <!-- stromy na místě zakryté osmičky (souřadnice obrázku) -->
+    <svg class="stromy" viewBox="0 0 1055 1491" aria-hidden="true">
+      <defs>
+        <g id="smrk">
+          <path class="b" d="M0 -66 L-7 -52 L-3 -52 L-11 -39 L-5 -39 L-14 -25 L-7 -25 L-18 -10 L18 -10 L7 -25 L14 -25 L5 -39 L11 -39 L3 -52 L7 -52 Z"/>
+          <path class="tenke" d="M0 -10 V0 M0 -58 V-10 M0 -46 l-4 4 M0 -46 l4 4 M0 -33 l-6 5 M0 -33 l6 5 M0 -20 l-8 6 M0 -20 l8 6"/>
+        </g>
+        <g id="strom">
+          <path d="M-2.5 0 V-22 M2.5 0 V-22"/>
+          <path class="b" d="M0 -78 Q6 -82 9 -74 Q16 -72 15 -62 Q21 -55 17 -46 Q20 -36 13 -32 Q12 -22 5 -23 Q0 -17 -5 -23 Q-12 -22 -13 -32 Q-20 -36 -17 -46 Q-21 -55 -15 -62 Q-16 -72 -9 -74 Q-6 -82 0 -78Z"/>
+          <path class="tenke" d="M0 -22 V-62 M0 -34 l-7 -8 M0 -44 l6 -8 M0 -54 l-4 -6"/>
+        </g>
+      </defs>
+      <use href="#smrk" transform="translate(648 690) scale(1.6)"/>
+      <use href="#strom" transform="translate(700 694) scale(1.35)"/>
+      <use href="#smrk" transform="translate(738 688) scale(1.1)"/>
+      <path class="tenke" d="M664 696 l3 -9 M669 696 v-11 M674 696 l-2 -8 M716 698 l3 -8 M721 698 v-10"/>
+    </svg>
   </div>
 </main>
 
