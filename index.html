@@ -63,10 +63,7 @@
   }
 
   main {
-    min-height: 100vh;
-    min-height: 100dvh;
     display: flex;
-    align-items: center;
     justify-content: center;
   }
 
@@ -74,9 +71,9 @@
   .mapa {
     position: relative;
     /* obrázek vyplní celou obrazovku (vejde se celý, bez posouvání) */
-    width: min(100vw, 100vh * 1055 / 1491);
-    width: min(100vw, 100dvh * 1055 / 1491);
-    aspect-ratio: 1055 / 1491;
+    width: min(100vw, 100vh * 880 / 1208);
+    width: min(100vw, 100dvh * 880 / 1208);
+    aspect-ratio: 880 / 1208;
     background: #fff;
     overflow: hidden;
     container-type: inline-size; /* cqw = % šířky mapy, ať domečky škálují s obrázkem */
@@ -88,80 +85,25 @@
     user-select: none;
     -webkit-user-drag: none;
   }
-  /* Bílá plocha přes text v pravém horním rohu obrázku */
-  .zakryt {
-    position: absolute;
-    left: 76.3%; top: 2.3%; width: 23.2%; height: 13.8%;
-    background: #fff;
-    clip-path: polygon(0 0, 100% 0, 100% 78%, 75% 78%, 75% 100%, 0 100%);
-  }
-  /* Bílá plocha přes druhou (duplicitní) osmičku v obrázku */
-  .zakryt.dum8 {
-    left: 58.6%; top: 37.1%; width: 12.2%; height: 9.7%;
-    clip-path: polygon(50% 0, 73% 19%, 72% 3%, 93% 3%, 93% 36%, 100% 42%, 100% 100%, 0 100%, 0 42%);
-  }
-
-  .mapa .stromy {
-    position: absolute; inset: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
-    fill: none;
-    stroke: var(--ink);
-    stroke-width: 2.6;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  .stromy .b { fill: #fff; }
-  .stromy .tenke { stroke-width: 1.5; }
-
-  /* HTML domeček položený přes ten nakreslený v obrázku */
+  /* Průhledná klikací plocha ve tvaru domečku nad domečkem v obrázku */
   .okenko {
     position: absolute;
     border: 0;
     padding: 0;
-    background: none;
+    background: transparent;
+    mix-blend-mode: multiply; /* obarví bílou plochu, čáry obrázku zůstanou */
+    clip-path: polygon(50% 0, 100% 46%, 100% 100%, 0 100%, 0 46%);
     cursor: pointer;
-    transition: transform .2s;
+    transition: background-color .2s, transform .2s;
   }
-  .okenko svg {
-    position: absolute; inset: 0;
-    width: 100%; height: 100%;
-    overflow: visible;
-  }
-  .okenko .dum, .okenko .komin {
-    fill: #fff;
-    stroke: var(--ink);
-    stroke-width: .3cqw;
-    stroke-linejoin: round;
-    vector-effect: non-scaling-stroke;
-    transition: fill .2s;
-  }
-  .okenko .ram {
-    fill: none;
-    stroke: var(--ink);
-    stroke-width: .12cqw;
-    stroke-dasharray: .45cqw .35cqw;
-    vector-effect: non-scaling-stroke;
-  }
-  .okenko .cislo {
-    position: absolute;
-    left: 0; right: 0; top: 42%; bottom: 6%;
-    display: grid;
-    place-items: center;
-    font-size: 3.2cqw;
-    line-height: 1;
-    color: var(--ink);
-  }
-  .okenko:hover, .okenko:focus-visible { transform: scale(1.04); outline: none; }
-  .okenko:hover .dum, .okenko:focus-visible .dum { fill: #f8e7b5; }
-  .okenko.otevreno .dum { fill: #fbe39a; } /* otevřené okénko „svítí" */
+  .okenko:hover, .okenko:focus-visible { background: #f8e7b5; transform: scale(1.04); outline: none; }
+  .okenko.otevreno { background: #fbe39a; } /* otevřené okénko „svítí" */
   .okenko.zamceno { cursor: not-allowed; }
-  .okenko.zamceno:hover { transform: none; }
-  .okenko.zamceno:hover .dum { fill: #f0f0f0; }
-  .okenko.dnes .dum { animation: pulz 1.8s ease-in-out infinite; }
+  .okenko.zamceno:hover { background: #ececec; transform: none; }
+  .okenko.dnes { animation: pulz 1.8s ease-in-out infinite; }
   @keyframes pulz {
-    0%, 100% { fill: #fff; }
-    50%      { fill: #f3c2bd; }
+    0%, 100% { background: transparent; }
+    50%      { background: #f3c2bd; }
   }
   /* „Nálepka" na otevřeném okénku */
   .okenko .nalepka {
@@ -274,27 +216,7 @@
 </header>
 <main>
   <div class="mapa" id="mapa">
-    <img src="img/mapa.jpg" alt="Mapa obce Mouchnice s 24 adventními domečky" width="1055" height="1491">
-    <div class="zakryt" aria-hidden="true"></div>
-    <div class="zakryt dum8" aria-hidden="true"></div>
-    <!-- stromy na místě zakryté osmičky (souřadnice obrázku) -->
-    <svg class="stromy" viewBox="0 0 1055 1491" aria-hidden="true">
-      <defs>
-        <g id="smrk">
-          <path class="b" d="M0 -66 L-7 -52 L-3 -52 L-11 -39 L-5 -39 L-14 -25 L-7 -25 L-18 -10 L18 -10 L7 -25 L14 -25 L5 -39 L11 -39 L3 -52 L7 -52 Z"/>
-          <path class="tenke" d="M0 -10 V0 M0 -58 V-10 M0 -46 l-4 4 M0 -46 l4 4 M0 -33 l-6 5 M0 -33 l6 5 M0 -20 l-8 6 M0 -20 l8 6"/>
-        </g>
-        <g id="strom">
-          <path d="M-2.5 0 V-22 M2.5 0 V-22"/>
-          <path class="b" d="M0 -78 Q6 -82 9 -74 Q16 -72 15 -62 Q21 -55 17 -46 Q20 -36 13 -32 Q12 -22 5 -23 Q0 -17 -5 -23 Q-12 -22 -13 -32 Q-20 -36 -17 -46 Q-21 -55 -15 -62 Q-16 -72 -9 -74 Q-6 -82 0 -78Z"/>
-          <path class="tenke" d="M0 -22 V-62 M0 -34 l-7 -8 M0 -44 l6 -8 M0 -54 l-4 -6"/>
-        </g>
-      </defs>
-      <use href="#smrk" transform="translate(648 690) scale(1.6)"/>
-      <use href="#strom" transform="translate(700 694) scale(1.35)"/>
-      <use href="#smrk" transform="translate(738 688) scale(1.1)"/>
-      <path class="tenke" d="M664 696 l3 -9 M669 696 v-11 M674 696 l-2 -8 M716 698 l3 -8 M721 698 v-10"/>
-    </svg>
+    <img src="img/mapa.jpg" alt="Mapa obce Mouchnice s 24 adventními domečky" width="880" height="1208">
   </div>
 </main>
 
@@ -312,42 +234,34 @@
   // Rok, ve kterém advent probíhá (okénko N se odemkne N. prosince).
   const ROK_ADVENTU = 2026;
 
-  // Pozice domečků v obrázku mapy (px v originálu 1055×1491): [x1, y1, x2, y2]
-  const OBR_W = 1055, OBR_H = 1491;
+  // Pozice domečků v obrázku mapy (px v originálu 880×1208): [x1, y1, x2, y2]
+  const OBR_W = 880, OBR_H = 1208;
   const DOMECKY = {
-    1:  [ 75, 315, 195, 448],
-    2:  [303, 404, 425, 535],
-    3:  [627, 352, 748, 483],
-    4:  [498, 455, 618, 582],
-    5:  [872, 387, 994, 518],
-    6:  [113, 502, 235, 636],
-    7:  [302, 561, 423, 688],
-    8:  [477, 595, 604, 724],
-    9:  [815, 559, 935, 692],
-    10: [932, 591, 1035, 718],
-    11: [363, 742, 485, 866],
-    12: [659, 728, 783, 859],
-    13: [812, 735, 940, 868],
-    14: [887, 955, 1003, 1083],
-    15: [528, 939, 649, 1065],
-    16: [199, 939, 320, 1066],
-    17: [ 82, 1074, 210, 1204],
-    18: [370, 1093, 493, 1222],
-    19: [526, 1096, 649, 1222],
-    20: [762, 1107, 882, 1223],
-    21: [173, 1216, 301, 1344],
-    22: [348, 1232, 472, 1356],
-    23: [585, 1232, 711, 1357],
-    24: [848, 1234, 977, 1365],
+    1:  [ 63, 266, 154, 365],
+    2:  [266, 299, 359, 400],
+    3:  [447, 309, 544, 411],
+    4:  [602, 322, 698, 426],
+    5:  [745, 328, 842, 433],
+    6:  [ 67, 417, 167, 527],
+    7:  [247, 433, 343, 537],
+    8:  [414, 443, 514, 551],
+    9:  [579, 463, 679, 569],
+    10: [731, 479, 829, 590],
+    11: [480, 614, 592, 719],
+    12: [594, 613, 693, 720],
+    13: [743, 629, 840, 732],
+    14: [ 83, 796, 183, 902],
+    15: [655, 788, 746, 887],
+    16: [744, 787, 843, 890],
+    17: [101, 936, 199, 1039],
+    18: [317, 936, 418, 1041],
+    19: [466, 936, 562, 1040],
+    20: [680, 937, 780, 1041],
+    21: [109, 1052, 210, 1153],
+    22: [312, 1059, 409, 1156],
+    23: [484, 1056, 586, 1155],
+    24: [701, 1056, 800, 1158],
   };
-
-  // Tvar domečku v souřadnicích 0–100 (roztáhne se na rámeček z DOMECKY)
-  const DUM_SVG =
-    '<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">' +
-    '<polygon class="komin" points="73,20 73,5 85,5 85,30"/>' +
-    '<polygon class="dum" points="50,0 100,42 96,42 96,100 4,100 4,42 0,42"/>' +
-    '<polygon class="ram" points="50,9 88,41 88,93 12,93 12,41"/>' +
-    "</svg>";
 
   const NALEPKY = ["⭐", "🎄", "🔔", "🎁", "❄️", "🕯️", "🍪", "🦌", "🎅", "🌟", "🧦"];
 
@@ -402,7 +316,6 @@
     btn.style.width = ((x2 - x1) / OBR_W * 100) + "%";
     btn.style.height = ((y2 - y1) / OBR_H * 100) + "%";
     btn.setAttribute("aria-label", "Okénko " + d);
-    btn.innerHTML = DUM_SVG + '<span class="cislo">' + d + "</span>";
     if (!jeOdemceno(d)) btn.classList.add("zamceno");
     if (d === dnesDen && !otevrena.has(d)) btn.classList.add("dnes");
     btn.addEventListener("click", () => otevri(d));
